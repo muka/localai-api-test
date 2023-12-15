@@ -1,0 +1,67 @@
+version: '3.6'
+
+networks:
+  localai-test:
+
+services:
+
+  app:
+    build: 
+      dockerfile: Dockerfile
+    networks:
+      - localai-test
+    volumes:
+      - ./src/query.py:/app/query.py
+      - ./src/store.py:/app/store.py
+    environment:
+      - OPENAI_API_BASE=http://caddy/v1
+      - OPENAI_API_KEY=tok
+      - MODEL_NAME=mistral
+      - MODEL_NAME_EMB=text-embedding-ada-002
+    command: query.py
+
+  caddy:
+    image: caddy:2-alpine
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile
+    networks:
+      - localai-test
+    depends_on:
+      - localai-api
+      - localai-emb
+    ports:
+      - 8080:80
+      
+  localai-api:
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    image: quay.io/go-skynet/local-ai:v2.0.0-cublas-cuda12
+    networks:
+      - localai-test
+    env_file:
+      - .env
+    volumes:
+      - ./data/models:/models
+      - ./data/images:/tmp/generated/images/
+
+  localai-emb:
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    image: quay.io/go-skynet/local-ai:v2.0.0-cublas-cuda12
+    networks:
+      - localai-test
+    env_file:
+      - .env
+    volumes:
+      - ./data/models:/models
+      - ./data/images:/tmp/generated/images/

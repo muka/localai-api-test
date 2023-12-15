@@ -1,0 +1,5 @@
+:80 {
+    reverse_proxy /v1/embeddings localai-emb:8080
+    reverse_proxy localai-api:8080
+}
+
