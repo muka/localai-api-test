@@ -15,7 +15,8 @@ services:
       - ./src/store.py:/app/store.py
     environment:
       - OPENAI_API_BASE=http://caddy/v1
-      - OPENAI_API_KEY=tok
+      # - OPENAI_API_BASE=http://localai-api:8080/v1
+      - OPENAI_API_KEY=stk-
       - MODEL_NAME=mistral
       - MODEL_NAME_EMB=text-embedding-ada-002
     command: query.py
@@ -31,7 +32,7 @@ services:
       - localai-emb
     ports:
       - 8080:80
-      
+
   localai-api:
     deploy:
       resources:

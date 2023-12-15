@@ -1,0 +1,17 @@
+context_size: 4096
+f16: true
+mmap: true
+name: mistral
+backend: llama
+parameters:
+  model: mistral-7b-openorca.Q6_K.gguf
+  temperature: 0.2
+  top_k: 40
+  top_p: 0.95
+stopwords:
+- <|im_end|>
+template:
+  chat: chatml-block
+  chat_message: chatml
+  completion: completion
+threads: 12
