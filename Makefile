@@ -1,5 +1,9 @@
 LOCALAI=http://localhost:8080
 
+restart-nvidia:
+	sudo rmmod nvidia_uvm || true
+	sudo modprobe nvidia_uvm  || true
+
 setup/models/embeddings:
 	curl ${LOCALAI}/models/apply -H "Content-Type: application/json" -d '{ "id": "model-gallery@bert-embeddings" }'  
 	make setup/copy-config
@@ -20,8 +24,12 @@ start/localai:
 	docker compose up localai-emb localai-api caddy -d
 
 logs/localai:
-	docker compose logs -f
+	docker compose logs -f --tail 100
 
 bash:
 	docker compose run --rm -it --entrypoint bash app
 
+stop:
+	docker compose down
+
+start: restart-nvidia stop start/localai logs/localai
